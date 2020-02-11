@@ -92,6 +92,10 @@ module.exports = class Proto
 
         conn.force = true
         conn.destroy()
+
+        let proxy = conn.proxy
+
+        console.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
     }
 
     /**
@@ -158,7 +162,7 @@ module.exports = class Proto
         conn.setTimeout(1000 * 3600);
         conn.on('timeout', () =>
         {
-            conn.destroy(new Error("not active socket"));
+            conn.destroy(new Error("long time not active socket"));
         });
 
         conn.on('error', (err) =>

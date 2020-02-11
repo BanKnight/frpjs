@@ -80,6 +80,10 @@ module.exports = class Proto
 
         conn.force = true
         conn.close()
+
+        let proxy = conn.proxy
+
+        console.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
     }
 
     /**
