@@ -72,7 +72,14 @@ module.exports = class Proto
 
             let conn = this.get_conn(proxy, rinfo)
 
+            conn.count++
+
             this.app.send(proxy.client, "transport", proxy.type, conn.id, msg)
+
+            if (conn.count % 1000 == 0)
+            {
+                console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:conn[${conn.id}]@${conn.domain} recved packet count:${conn.count}`)
+            }
         })
 
         proxy.server.bind(proxy.remote_port)
@@ -169,6 +176,7 @@ module.exports = class Proto
 
         conn = {}
         conn.id = ++this.id_helper
+        conn.count = 0
         conn.domain = domain
         conn.info = info
         conn.proxy = proxy
@@ -180,7 +188,7 @@ module.exports = class Proto
             proxy.server.send(buffer, 0, buffer.length, info.port, info.address)
         }
 
-        conn.destroy = () =>
+        conn.destroy = (e) =>
         {
             conn.closed = true
 
@@ -188,6 +196,15 @@ module.exports = class Proto
             delete this.conns[conn.id]
 
             this.app.send(proxy.client, "del_conn", proxy.type, conn.id)
+
+            if (e)
+            {
+                console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:closed because of an error":`, e);
+            }
+            else
+            {
+                console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:conn[${conn.id}] close`);
+            }
         }
 
         this.conns[domain] = conn
@@ -207,7 +224,7 @@ module.exports = class Proto
             if (now - conn.last_active >= timeout)
             {
                 conn.force = true
-                conn.destroy()
+                conn.destroy(new Error("long time not active socket"))
                 return
             }
 
@@ -215,6 +232,8 @@ module.exports = class Proto
         }
 
         setTimeout(check_timeout, timeout)
+
+        console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:new conn[${conn.id}]`);
 
         return conn
     }

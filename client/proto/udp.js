@@ -31,6 +31,7 @@ module.exports = class Proto
         let conn = net.createSocket('udp4');
 
         conn.id = conn_id
+        conn.count = 0
         conn.proxy = proxy
 
         conn.bind(0)            //随机端口
@@ -63,7 +64,6 @@ module.exports = class Proto
         this.conns[conn.id] = conn
 
         console.log(`proxy[${proxy.name}][udp][${proxy.local_port}]: make conn[${conn.id}]`);
-
     }
 
     /**
@@ -75,6 +75,7 @@ module.exports = class Proto
 
         if (conn == null)
         {
+            console.log(`proxy[unknown][udp][unknown]: del a non-existent conn[${conn_id}]`);
             return
         }
 
@@ -95,16 +96,27 @@ module.exports = class Proto
 
         if (conn == null)
         {
+            console.log(`proxy[unknown][udp][unknown]: send proxy to a non-existent conn[${conn_id}]`);
+
             return
         }
 
+        conn.count++
+
         conn.send(data)
+
+        if (conn.count % 1000 == 0)
+        {
+            let proxy = conn.proxy
+
+            console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:conn[${conn.id}] send packet count:${conn.count}`)
+        }
     }
 
     /**
-     * 客户端断开
+     * 服务端断开
      */
-    lost(client)
+    lost()
     {
         for (let conn_id in this.conns)
         {
