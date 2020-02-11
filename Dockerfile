@@ -8,4 +8,4 @@ RUN npm install --registry=https://registry.npm.taobao.org
 
 COPY * ./
 
-CMD [ "node", "index.js" ]
+ENTRYPOINT [ "node", "index.js" ]
