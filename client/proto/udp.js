@@ -43,7 +43,7 @@ module.exports = class Proto
 
             if (!has_error)
             {
-                console.log(`proxy[${proxy.name}][udp][${proxy.local_port}]:conn[${conn.id}] close`);
+                this.app.log(`proxy[${proxy.name}][udp][${proxy.local_port}]:conn[${conn.id}] close`);
             }
 
             delete this.conns[conn.id]
@@ -63,7 +63,7 @@ module.exports = class Proto
 
         this.conns[conn.id] = conn
 
-        console.log(`proxy[${proxy.name}][udp][${proxy.local_port}]: make conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][udp][${proxy.local_port}]: make conn[${conn.id}]`);
     }
 
     /**
@@ -75,7 +75,7 @@ module.exports = class Proto
 
         if (conn == null)
         {
-            console.log(`proxy[unknown][udp][unknown]: del a non-existent conn[${conn_id}]`);
+            this.app.log(`proxy[unknown][udp][unknown]: del a non-existent conn[${conn_id}]`);
             return
         }
 
@@ -84,7 +84,7 @@ module.exports = class Proto
 
         let proxy = conn.proxy
 
-        console.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
     }
 
     /**
@@ -96,7 +96,7 @@ module.exports = class Proto
 
         if (conn == null)
         {
-            console.log(`proxy[unknown][udp][unknown]: send proxy to a non-existent conn[${conn_id}]`);
+            this.app.log(`proxy[unknown][udp][unknown]: send proxy to a non-existent conn[${conn_id}]`);
 
             return
         }
@@ -109,7 +109,7 @@ module.exports = class Proto
         {
             let proxy = conn.proxy
 
-            console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:conn[${conn.id}] send packet count:${conn.count}`)
+            this.app.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:conn[${conn.id}] send packet count:${conn.count}`)
         }
     }
 

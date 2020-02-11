@@ -34,6 +34,11 @@ module.exports = class Application
         this.connect(this.config.ip, this.config.port)
     }
 
+    log(...args)
+    {
+        console.log(`${new Date().toLocaleString().replace('T', ' ').substr(0, 19)}`, ...args)
+    }
+
     load_config()
     {
         this.config = require("../config/client")
@@ -78,7 +83,7 @@ module.exports = class Application
             let proto = this.proto[proxy_config.type]
             if (proto == null)
             {
-                console.error(`not suported type in proxy[${proxy_config.name}]`)
+                this.log(`not suported type in proxy[${proxy_config.name}]`)
                 continue
             }
 
@@ -92,7 +97,7 @@ module.exports = class Application
 
         conn.connect(port, ip, () =>
         {
-            console.log('成功连接到服务器', ip, port);
+            this.log('成功连接到服务器', ip, port);
 
             conn.out_stream = new buffer_op.Stream()
             conn.out_writer = new buffer_op.Writer(conn.out_stream)
@@ -104,7 +109,7 @@ module.exports = class Application
 
         conn.on('error', (err) =>
         {
-            console.log('与客户端通信过程中发生错误，错误码为%s', err);
+            conn.last_error = err
         });
         conn.on('end', () =>
         {
@@ -115,7 +120,11 @@ module.exports = class Application
         {
             if (!has_error)
             {
-                console.log(`和${ip}:${port}的连接断开,5s 后重连`);
+                this.log(`和${ip}:${port}的连接断开,5s 后重连`);
+            }
+            else
+            {
+                this.log(`和${ip}:${port}的连接断开,原因：`, conn.last_error);
             }
 
             if (!conn.connecting)
@@ -265,7 +274,7 @@ module.exports = class Application
         }
         catch (e)
         {
-            console.error(e.stack)
+            this.log(e.stack)
         }
     }
 

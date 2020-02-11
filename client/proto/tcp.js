@@ -41,7 +41,7 @@ module.exports = class Proto
 
         conn.on('error', (err) =>
         {
-            console.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]：make conn[${conn.id}] error:`, err);
+            this.app.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]：make conn[${conn.id}] error:`, err);
         });
         conn.on('end', () =>
         {
@@ -52,7 +52,7 @@ module.exports = class Proto
         {
             if (!has_error)
             {
-                console.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:conn[${conn.id}] close`);
+                this.app.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:conn[${conn.id}] close`);
             }
 
             delete this.conns[conn.id]
@@ -84,7 +84,7 @@ module.exports = class Proto
 
         let proxy = conn.proxy
 
-        console.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
     }
 
     /**
@@ -136,6 +136,6 @@ module.exports = class Proto
             this.app.send("transport", proxy.type, conn.id, data)
         })
 
-        console.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:make a new conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:make a new conn[${conn.id}]`);
     }
 }

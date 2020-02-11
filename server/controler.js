@@ -20,7 +20,7 @@ module.exports = class Controller
             let proto = this.app.proto[proxy_config.type]
             if (proto == null)
             {
-                console.error(`not suported type in proxy[${proxy_config.name}]`)
+                this.app.log(`not suported type in proxy[${proxy_config.name}]`)
                 continue
             }
 

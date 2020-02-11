@@ -32,6 +32,11 @@ module.exports = class Application
         this.listen(this.config.port)
     }
 
+    log(...args)
+    {
+        console.log(`${new Date().toLocaleString().replace('T', ' ').substr(0, 19)}`, ...args)
+    }
+
     load_config()
     {
         this.config = require("../config/server")
@@ -51,6 +56,7 @@ module.exports = class Application
         this.controler = new Controler(this)
     }
 
+
     start_proto()
     {
         for (let name in this.proto_classes)
@@ -69,11 +75,13 @@ module.exports = class Application
 
         server.on("listening", () =>
         {
-            console.log(`listening on`, port)
+            this.log(`listening on`, port)
         })
 
         server.on('connection', (socket) =>
         {
+            socket.setKeepAlive(true)
+
             socket.id = this.id_helper++
             socket.out_stream = new buffer_op.Stream()
             socket.out_writer = new buffer_op.Writer(socket.out_stream)
@@ -88,7 +96,7 @@ module.exports = class Application
     {
         this.clients[conn.id] = conn
 
-        console.log('新的客户端已经连接到服务器');
+        this.log('新的客户端已经连接到服务器');
 
         conn.setTimeout(1000 * 3600 * 8);
         conn.on('timeout', () =>
@@ -98,7 +106,7 @@ module.exports = class Application
 
         conn.on('error', (err) =>
         {
-            console.log('与客户端通信过程中发生错误，错误码为%s', err);
+            conn.last_error = err
         });
         conn.on('end', () =>
         {
@@ -108,11 +116,11 @@ module.exports = class Application
         {
             if (has_error)
             {
-                console.log('由于一个错误导致socket连接被关闭');
+                this.log('由于一个错误导致socket连接被关闭', conn.last_error);
             }
             else
             {
-                console.log('socket连接正常关闭');
+                this.log('socket连接正常关闭');
             }
 
             delete this.clients[conn.id]
@@ -167,7 +175,7 @@ module.exports = class Application
         //第一个参数必然是发送方的进程id
         conn.on("data", (data) =>          
         {
-            // console.log(`recv buffer:${data.byteLength}`)
+            // this.log(`recv buffer:${data.byteLength}`)
 
             decoder.in_buffers.push([0, Buffer.from(data)])
             decoder.in_buffer_bytes += data.byteLength
@@ -183,7 +191,7 @@ module.exports = class Application
                     }
                     decoder.wait = buffer.readInt32LE(0)            //读出长度
 
-                    // console.log("read head:" + decoder.wait)
+                    // this.log("read head:" + decoder.wait)
                 }
                 else if (decoder.wait > 0 && decoder.wait < 1024 * 1024 * 24)
                 {
@@ -238,7 +246,7 @@ module.exports = class Application
         }
         catch (e)
         {
-            console.error(e.stack)
+            this.log(e.stack)
         }
     }
 

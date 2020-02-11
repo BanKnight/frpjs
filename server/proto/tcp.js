@@ -5,7 +5,7 @@ module.exports = class Proto
     constructor(app)
     {
         this.app = app
-        this.id_helper = 0
+        this.id_helper = Date.now()
         this.proxy = {}             //[name] = proxy
         this.port_proxy = {}        //
         this.conns = {}
@@ -33,7 +33,7 @@ module.exports = class Proto
 
         this.run_proxy(proxy)
 
-        console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:add`);
+        this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:add`);
 
         return proxy
     }
@@ -44,11 +44,13 @@ module.exports = class Proto
 
         proxy.server.on("listening", () =>
         {
-            console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:is listening`)
+            this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:is listening`)
         })
 
         proxy.server.on('connection', (socket) =>
         {
+            socket.setKeepAlive(true)
+
             socket.id = ++this.id_helper
             socket.proxy = proxy
 
@@ -61,7 +63,7 @@ module.exports = class Proto
         {
             if (e.code == 'EADDRINUSE')
             {
-                console.error(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:is in use,try in 5s`);
+                this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:is in use,try in 5s`);
             }
 
             if (proxy.server.force)
@@ -95,7 +97,7 @@ module.exports = class Proto
 
         let proxy = conn.proxy
 
-        console.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][${proxy.type}][${proxy.local_port}]: remote del conn[${conn.id}]`);
     }
 
     /**
@@ -132,7 +134,7 @@ module.exports = class Proto
             delete this.proxy[name]
             delete this.port_proxy[proxy.remote_port]
 
-            console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:deleted because of client lost`);
+            this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:deleted because of client lost`);
         }
 
         for (let conn_id in this.conns)
@@ -157,7 +159,7 @@ module.exports = class Proto
     {
         this.app.send(proxy.client, "new_conn", proxy.name, conn.id)
 
-        console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:new conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:new conn[${conn.id}]@${conn.address().address}:${conn.address().port}`);
 
         conn.setTimeout(1000 * 3600);
         conn.on('timeout', () =>
@@ -167,7 +169,7 @@ module.exports = class Proto
 
         conn.on('error', (err) =>
         {
-            console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:conn error":`, err);
+            conn.last_error = err
         });
         conn.on('end', () =>
         {
@@ -177,7 +179,11 @@ module.exports = class Proto
         {
             if (!has_error)
             {
-                console.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:conn[${conn.id}] close`);
+                this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:conn[${conn.id}] close`);
+            }
+            else
+            {
+                this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:conn[${conn.id}] closed because of error:`, conn.last_error);
             }
 
             delete this.conns[conn.id]
