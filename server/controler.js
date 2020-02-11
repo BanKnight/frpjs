@@ -26,6 +26,7 @@ module.exports = class Controller
 
             proto.add_proxy(proxy_config, conn)
         }
+
     }
 
     /**
