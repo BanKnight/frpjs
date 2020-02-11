@@ -159,7 +159,7 @@ module.exports = class Proto
     {
         this.app.send(proxy.client, "new_conn", proxy.name, conn.id)
 
-        this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:new conn[${conn.id}]@${conn.address().address}:${conn.address().port}`);
+        this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:new conn[${conn.id}]@${conn.localAddress}:${conn.localPort}`);
 
         conn.setTimeout(1000 * 3600);
         conn.on('timeout', () =>
