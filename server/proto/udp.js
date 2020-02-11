@@ -172,7 +172,12 @@ module.exports = class Proto
             return conn
         }
 
-        let timeout = 1000 * 10
+        let timeout = 1000 * 3600
+
+        if (process.env.NODE_ENV == "development")
+        {
+            timeout = 1000 * 8
+        }
 
         conn = {}
         conn.id = ++this.id_helper
