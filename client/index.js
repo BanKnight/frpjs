@@ -113,13 +113,9 @@ module.exports = class Application
 
         conn.on('close', (has_error) =>       
         {
-            if (has_error)
+            if (!has_error)
             {
-                console.log('由于一个错误导致socket连接被关闭');
-            }
-            else
-            {
-                console.log('socket连接正常关闭');
+                console.log(`和${ip}:${port}的连接断开,5s 后重连`);
             }
 
             if (!conn.connecting)

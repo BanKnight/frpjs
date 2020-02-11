@@ -68,7 +68,7 @@ module.exports = class Proto
 
         proxy.server.on("message", (msg, rinfo) =>
         {
-            console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:recv data from ${rinfo.address}:${rinfo.port}`)
+            // console.log(`proxy[${proxy.name}][udp][${proxy.remote_port}]:recv data from ${rinfo.address}:${rinfo.port}`)
 
             let conn = this.get_conn(proxy, rinfo)
 
