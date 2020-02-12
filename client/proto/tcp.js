@@ -124,6 +124,8 @@ module.exports = class Proto
 
     _on_new_conn(conn, proxy)
     {
+        conn.setKeepAlive(true)
+
         for (let data of conn.standby)
         {
             conn.write(data)

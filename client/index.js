@@ -99,8 +99,15 @@ module.exports = class Application
         {
             this.log('成功连接到服务器', ip, port);
 
+            conn.setKeepAlive(true)
+
             conn.out_stream = new buffer_op.Stream()
             conn.out_writer = new buffer_op.Writer(conn.out_stream)
+
+            conn.heart_beat = setInterval(() =>
+            {
+                this.heart_beat()
+            }, 10 * 1000)
 
             this.conn = conn
 
@@ -127,6 +134,11 @@ module.exports = class Application
                 this.log(`和${ip}:${port}的连接断开,原因：`, conn.last_error);
             }
 
+            if (conn.heart_beat)
+            {
+                clearInterval(conn.heart_beat)
+            }
+
             if (!conn.connecting)
             {
                 this._on_lost()
@@ -147,6 +159,11 @@ module.exports = class Application
             this.connect(this.config.ip, this.config.port);
 
         }, 5000)
+    }
+
+    heart_beat()
+    {
+        this.send("heart_beat")
     }
 
     _after_connect(conn)

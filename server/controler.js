@@ -9,6 +9,11 @@ module.exports = class Controller
         this.config = app.config
     }
 
+    heart_beat()
+    {
+
+    }
+
     add_proxy(conn, config)
     {
         for (let name in config)
