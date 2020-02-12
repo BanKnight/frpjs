@@ -13,20 +13,7 @@ module.exports = class Proto
 
     add_proxy(info, conn)
     {
-        let proxy = this.proxy[info.name]
-
-        if (proxy)
-        {
-            throw new Error(`proxy[${info.name}] already exist`)
-        }
-
-        let exist_port = this.port_proxy[info.remote_port]
-        if (exist_port)
-        {
-            throw new Error(`proxy[${info.name}] remote port[${info.remote_port}] has already exist`)
-        }
-
-        proxy = { ...info, client: conn }
+        let proxy = { ...info, client: conn }
 
         this.proxy[info.name] = proxy
         this.port_proxy[info.remote_port] = proxy
@@ -172,7 +159,7 @@ module.exports = class Proto
             return conn
         }
 
-        let timeout = 1000 * 3600
+        let timeout = 1000 * 1800
 
         if (process.env.NODE_ENV == "development")
         {

@@ -16,6 +16,8 @@ module.exports = class Controller
 
     add_proxy(conn, config)
     {
+        let is_ok = true
+
         for (let name in config)
         {
             let proxy_config = config[name]
@@ -26,12 +28,38 @@ module.exports = class Controller
             if (proto == null)
             {
                 this.app.log(`not suported type in proxy[${proxy_config.name}]`)
-                continue
+                is_ok = false
+                break
             }
+            if (proto.proxy[name])
+            {
+                this.app.log(`proxy[${name}][${proxy_config.type}][${proxy_config.remote_port}] is already existed`)
+                is_ok = false
+                break
+            }
+
+            if (proto.port_proxy[proxy_config.remote_port])
+            {
+                this.app.log(`proxy[${name}][${proxy_config.type}][${proxy_config.remote_port}] confict port`)
+                is_ok = false
+                break
+            }
+        }
+        if (!is_ok)
+        {
+            return false
+        }
+
+        for (let name in config)
+        {
+            let proxy_config = config[name]
+
+            let proto = this.app.proto[proxy_config.type]
 
             proto.add_proxy(proxy_config, conn)
         }
 
+        return true
     }
 
     /**

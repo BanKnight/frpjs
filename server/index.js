@@ -256,7 +256,7 @@ module.exports = class Application
     {
         try
         {
-            const ret = await this.controler[func_name](...args)
+            const ret = await this.controler[func_name](conn, ...args)
 
             this.resp(conn, session, null, ret)
         }

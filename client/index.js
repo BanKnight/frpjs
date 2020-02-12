@@ -257,7 +257,29 @@ module.exports = class Application
             }
         })
 
-        this.send("add_proxy", this.config.proxy)
+        this.add_proxy()
+    }
+
+    async add_proxy()
+    {
+        if (this.conn == null)
+        {
+            return
+        }
+
+        let is_ok = await this.call("add_proxy", this.config.proxy)
+
+        if (is_ok)
+        {
+            this.log("注册代理成功")
+            return
+        }
+
+        this.log("注册代理失败，5s后重试")
+        setTimeout(() =>
+        {
+            this.add_proxy()
+        }, 5000)
     }
 
     _on_lost()
