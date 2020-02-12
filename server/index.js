@@ -96,9 +96,11 @@ module.exports = class Application
     {
         this.clients[conn.id] = conn
 
-        this.log('新的客户端已经连接到服务器');
+        const address = conn.address()
 
-        conn.setTimeout(1000 * 3600 * 8);
+        this.log('新的客户端已经连接到服务器', address.address, address.port);
+
+        conn.setTimeout(1000 * 20);
         conn.on('timeout', () =>
         {
             conn.destroy(new Error("not active socket"));
@@ -116,11 +118,11 @@ module.exports = class Application
         {
             if (has_error)
             {
-                this.log('由于一个错误导致socket连接被关闭', conn.last_error);
+                this.log(`${address.address}:${address.port} closed because of error`, conn.last_error);
             }
             else
             {
-                this.log('socket连接正常关闭');
+                this.log(`${address.address}:${address.port} 关闭`);
             }
 
             delete this.clients[conn.id]

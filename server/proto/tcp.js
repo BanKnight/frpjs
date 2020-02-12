@@ -161,7 +161,7 @@ module.exports = class Proto
 
         this.app.log(`proxy[${proxy.name}][tcp][${proxy.remote_port}]:new conn[${conn.id}]@${conn.localAddress}:${conn.localPort}`);
 
-        conn.setTimeout(1000 * 3600);
+        conn.setTimeout(1000 * 1800);
         conn.on('timeout', () =>
         {
             conn.destroy(new Error("long time not active socket"));
