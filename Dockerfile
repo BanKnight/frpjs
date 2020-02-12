@@ -11,8 +11,9 @@ FROM astefanutti/scratch-node
 ARG TZ='Asia/Shanghai'
 ENV TZ ${TZ}
 
-RUN ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && echo ${TZ} > /etc/timezone
+RUN apk add tzdata && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && apk del tzdata
 
 WORKDIR /app
 
