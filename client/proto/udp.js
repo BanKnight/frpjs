@@ -33,9 +33,28 @@ module.exports = class Proto
         conn.id = conn_id
         conn.count = 0
         conn.proxy = proxy
+        conn.standby = []
 
         conn.bind(0)            //随机端口
-        conn.connect(proxy.local_port, proxy.local_ip)
+
+        conn.on('listening', () =>
+        {
+            conn.connecting = true
+            conn.connect(proxy.local_port, proxy.local_ip)
+        });
+
+        conn.on("connect", () =>
+        {
+            conn.connecting = false
+            conn.connected = true
+
+            for (let data of conn.standby)
+            {
+                conn.send(data)
+            }
+
+            conn.standby = null
+        })
 
         conn.on('close', (has_error) =>
         {
@@ -75,7 +94,7 @@ module.exports = class Proto
 
         if (conn == null)
         {
-            this.app.log(`proxy[unknown][udp][unknown]: del a non-existent conn[${conn_id}]`);
+            this.app.log(`proxy[unknown][udp][unknown]:del a non-existent conn[${conn_id}]`);
             return
         }
 
@@ -96,14 +115,21 @@ module.exports = class Proto
 
         if (conn == null)
         {
-            this.app.log(`proxy[unknown][udp][unknown]: send proxy to a non-existent conn[${conn_id}]`);
+            this.app.log(`proxy[unknown][udp][unknown]:send proxy to a non-existent conn[${conn_id}]`);
 
             return
         }
 
         conn.count++
 
-        conn.send(data)
+        if (conn.standby)
+        {
+            conn.standby.push(data)
+        }
+        else
+        {
+            conn.send(data)
+        }
 
         if (conn.count % 1000 == 0)
         {

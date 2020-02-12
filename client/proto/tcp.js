@@ -24,14 +24,14 @@ module.exports = class Proto
         return exist
     }
 
-    new_conn(proxy_name, conn_id, standby)
+    new_conn(proxy_name, conn_id)
     {
         let proxy = this.proxy[proxy_name]
 
         let conn = new net.Socket()
 
         conn.id = conn_id
-        conn.standby = standby || []
+        conn.standby = []
         conn.proxy = proxy
 
         conn.connect(proxy.local_port, proxy.local_ip, () =>
