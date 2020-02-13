@@ -11,7 +11,7 @@ FROM banknight/node:slim
 ARG TZ='Asia/Shanghai'
 ENV TZ ${TZ}
 
-RUN apk add tzdata && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+RUN apk add --no-cache tzdata && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && apk del tzdata
 
