@@ -131,6 +131,7 @@ module.exports = class Proto
             conn.write(data)
         }
 
+
         conn.standby = null
 
         conn.on('data', (data) =>
@@ -138,6 +139,6 @@ module.exports = class Proto
             this.app.send("transport", proxy.type, conn.id, data)
         })
 
-        this.app.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:make a new conn[${conn.id}]`);
+        this.app.log(`proxy[${proxy.name}][tcp][${proxy.local_port}]:make a new conn[${conn.id}]`, conn.remoteAddress, conn.remotePort);
     }
 }

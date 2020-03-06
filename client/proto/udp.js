@@ -56,6 +56,11 @@ module.exports = class Proto
             conn.standby = null
         })
 
+        conn.on('error', (err) =>
+        {
+            this.app.log(`proxy[${proxy.name}][udp][${proxy.local_port}]：make conn[${conn.id}] error:`, err);
+        });
+
         conn.on('close', (has_error) =>
         {
             conn.closed = true
