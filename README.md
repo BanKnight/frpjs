@@ -53,7 +53,7 @@ module.exports = {
 ```
 docker run --restart=always --network host -d -v ${PWD}/client.js:/app/config/client.js --name frpc banknight/frp client
 ```
-### nodejs
+### nodejs方式
 ```
 node ./index.js client
 ```
