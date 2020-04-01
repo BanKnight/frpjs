@@ -1,22 +1,33 @@
 # frp
-一个用于内网穿透的工具，将拥有公共ip的服务器的数据转发到内网，协议支持tcp + udp
+一个用于内网穿透的工具，将拥有公共ip的服务器的数据转发到内网，协议支持tcp + udp。
 
-# 服务端
-```
-docker run --restart=always --network host -d -v ${PWD}/server.js:/app/config/server.js --name frps banknight/frp server
-```
-## 配置
+# 重造轮子的原因
+fatedier/frp的udp支持有问题，在使用vpn的时候，导致只有一个可以有效连接。
+
+# 如何使用
+支持docker以及nodejs两种方式。
+
+## 服务端
+### 配置
 参考：[server.js](https://github.com/BanKnight/frp/blob/master/config/server.js)
 ```js
 module.exports = {
     port: 7666,                 //接收客户端
 }
 ```
-# 客户端
+### docker方式
 ```
-docker run --restart=always --network host -d -v ${PWD}/client.js:/app/config/client.js --name frpc banknight/frp client
+docker run --restart=always --network host -d -v ${PWD}/server.js:/app/config/server.js --name frps banknight/frp server
 ```
-## 配置
+
+### nodejs方式
+```
+node ./index.js server
+```
+
+## 客户端
+
+### 配置
 参考：[client.js](https://github.com/BanKnight/frp/blob/master/config/client.js)
 ```js
 module.exports = {
@@ -37,6 +48,14 @@ module.exports = {
         }
     }
 }
+```
+### docker方式
+```
+docker run --restart=always --network host -d -v ${PWD}/client.js:/app/config/client.js --name frpc banknight/frp client
+```
+### nodejs
+```
+node ./index.js client
 ```
 
 # 参考项目
